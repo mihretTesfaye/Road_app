@@ -1,0 +1,36 @@
+name: tillash_app
+description: A Flutter project for Tillash App
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Routing
+  go_router: ^17.0.1
+
+  # Maps
+  google_maps_flutter: ^2.9.0
+
+  # Useful extras
+  cupertino_icons: ^1.0.5
+  provider: ^6.0.5
+  flutter_svg: ^2.0.7
+  shared_preferences: ^2.2.1
+  google_fonts: ^4.0.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
