@@ -25,9 +25,15 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
-        return windows;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -64,23 +70,5 @@ class DefaultFirebaseOptions {
     projectId: 'roadapp-7f30d',
     storageBucket: 'roadapp-7f30d.firebasestorage.app',
     iosBundleId: 'com.example.taraApp',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCDUbKs2UGCrAMyhGps_5E-4onB5-w04Gk',
-    appId: '1:616483723793:ios:61d2c8f4fdbfaa14ac2fb0',
-    messagingSenderId: '616483723793',
-    projectId: 'roadapp-7f30d',
-    storageBucket: 'roadapp-7f30d.firebasestorage.app',
-    iosBundleId: 'com.example.taraApp',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDUKEcr4mNoR9YZe5Q6qWBeKCKxkCrmxmQ',
-    appId: '1:616483723793:web:0141667fed6b7ecfac2fb0',
-    messagingSenderId: '616483723793',
-    projectId: 'roadapp-7f30d',
-    authDomain: 'roadapp-7f30d.firebaseapp.com',
-    storageBucket: 'roadapp-7f30d.firebasestorage.app',
   );
 }
