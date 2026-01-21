@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "616483723793",
+    "project_id": "roadapp-7f30d",
+    "storage_bucket": "roadapp-7f30d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616483723793:android:7560703cbe10ba2cac2fb0",
+        "android_client_info": {
+          "package_name": "com.example.tara_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7pYMvl2b7sHaONwYl1x26jGWVzxxd1J0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
