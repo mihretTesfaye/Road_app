@@ -69,10 +69,10 @@ class PrimaryButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (icon != null) ...[
-                Icon(icon, size: 20),
-                const SizedBox(width: AppTheme.spacingS),
-              ],
+                if (icon != null) ...[
+                  Icon(icon, size: 20),
+                  const SizedBox(width: AppTheme.spacingS),
+                ],
               Text(
                 text,
                 style: AppTheme.buttonText.copyWith(

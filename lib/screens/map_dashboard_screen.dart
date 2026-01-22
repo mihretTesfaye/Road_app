@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart' show GoogleMap, GoogleMapController, CameraPosition, LatLng, MapType, Marker, MarkerId, InfoWindow;
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' show GoogleMap, GoogleMapController, CameraPosition, LatLng, MapType, Marker, MarkerId, InfoWindow;
+
 import '../app_theme.dart';
 import '../routes.dart';
 import '../widgets/drawer_menu.dart';
@@ -27,7 +29,7 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
         title: const Text('Tillash Roads'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined),
+            icon: const Icon(Icons.notifications_outlined, color: AppTheme.textPrimary),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Notifications coming soon')),
@@ -66,49 +68,49 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
                   ),
                 ],
               ),
-              child: BottomNavigationBar(
-                currentIndex: _currentIndex,
-                onTap: (index) {
-                  setState(() => _currentIndex = index);
-                  if (index == 1) {
-                    // Navigate to contacts
-                    context.go(AppRoutes.contacts);
-                  } else if (index == 2) {
-                    // History tab
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('History coming soon')),
-                    );
-                    setState(() => _currentIndex = 0);
-                  } else if (index == 3) {
-                    // Settings tab
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Settings coming soon')),
-                    );
-                    setState(() => _currentIndex = 0);
-                  }
-                },
-                type: BottomNavigationBarType.fixed,
-                selectedItemColor: AppTheme.primaryColor,
-                unselectedItemColor: AppTheme.textSecondary,
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.map),
-                    label: 'Map',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.contacts),
-                    label: 'Contacts',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.history),
-                    label: 'History',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.settings),
-                    label: 'Settings',
-                  ),
-                ],
-              ),
+                child: BottomNavigationBar(
+                  currentIndex: _currentIndex,
+                  onTap: (index) {
+                    setState(() => _currentIndex = index);
+                    if (index == 1) {
+                      // Navigate to contacts
+                      context.go(AppRoutes.contacts);
+                    } else if (index == 2) {
+                      // History tab
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('History coming soon')),
+                      );
+                      setState(() => _currentIndex = 0);
+                    } else if (index == 3) {
+                      // Settings tab
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Settings coming soon')),
+                      );
+                      setState(() => _currentIndex = 0);
+                    }
+                  },
+                  type: BottomNavigationBarType.fixed,
+                  selectedItemColor: AppTheme.primaryColor,
+                  unselectedItemColor: AppTheme.textSecondary,
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: SvgPicture.asset('assets/icons/map.svg', width: 22, height: 22),
+                      label: 'Map',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: SvgPicture.asset('assets/icons/contacts.svg', width: 22, height: 22),
+                      label: 'Contacts',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: SvgPicture.asset('assets/icons/history.svg', width: 22, height: 22),
+                      label: 'History',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: SvgPicture.asset('assets/icons/settings.svg', width: 22, height: 22),
+                      label: 'Settings',
+                    ),
+                  ],
+                ),
             ),
           ),
         ],

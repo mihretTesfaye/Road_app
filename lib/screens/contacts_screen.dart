@@ -154,7 +154,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             padding: const EdgeInsets.all(AppTheme.spacingM),
             child: TextField(
               controller: _searchController,
-              decoration: InputDecoration(
+                decoration: InputDecoration(
                 hintText: 'Search contacts...',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
