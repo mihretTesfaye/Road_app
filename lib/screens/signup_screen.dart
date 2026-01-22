@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../app_theme.dart';
 import '../routes.dart';
-import '../widgets/primary_button.dart';
+import '../services/auth_service.dart';
 import '../widgets/input_field.dart';
+import '../widgets/primary_button.dart';
 
 /// Signup screen with full name, email, password, and social signup UI
 class SignupScreen extends StatefulWidget {
@@ -35,14 +38,27 @@ class _SignupScreenState extends State<SignupScreen> {
   Future<void> _handleSignup() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
-      
-      if (mounted) {
+      try {
+        final name = _nameController.text.trim();
+        final email = _emailController.text.trim();
+        final password = _passwordController.text;
+
+        await AuthService.instance.signUp(name: name, email: email, password: password);
+
+        if (mounted) {
+          setState(() => _isLoading = false);
+          context.go(AppRoutes.locationPermission);
+        }
+      } on FirebaseAuthException catch (e) {
         setState(() => _isLoading = false);
-        // Navigate to location permission screen after signup
-        context.go(AppRoutes.locationPermission);
+        final msg = '${e.code}: ${e.message ?? 'Signup failed'}';
+        print('Signup FirebaseAuthException: $msg');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      } catch (e) {
+        setState(() => _isLoading = false);
+        final msg = e.toString();
+        print('Signup error: $msg');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
       }
     }
   }

@@ -1,26 +1,11 @@
 import 'package:flutter/material.dart';
+
 import '../app_theme.dart';
-
-/// Contact model for dummy data
-class Contact {
-  final String id;
-  final String name;
-  final String phone;
-  final String? email;
-  final String? avatar;
-
-  Contact({
-    required this.id,
-    required this.name,
-    required this.phone,
-    this.email,
-    this.avatar,
-  });
-}
+import '../models/contact_model.dart';
 
 /// Contact tile widget for displaying contacts in a list
 class ContactTile extends StatelessWidget {
-  final Contact contact;
+  final ContactModel contact;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
@@ -54,16 +39,7 @@ class ContactTile extends StatelessWidget {
         leading: CircleAvatar(
           radius: 24,
           backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
-          child: contact.avatar != null
-              ? ClipOval(
-                  child: Image.network(
-                    contact.avatar!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        _buildInitialsAvatar(),
-                  ),
-                )
-              : _buildInitialsAvatar(),
+          child: _buildInitialsAvatar(),
         ),
         title: Text(
           contact.name,

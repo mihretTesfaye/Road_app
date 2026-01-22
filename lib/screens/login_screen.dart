@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../app_theme.dart';
 import '../routes.dart';
-import '../widgets/primary_button.dart';
+import '../services/auth_service.dart';
 import '../widgets/input_field.dart';
+import '../widgets/primary_button.dart';
 
 /// Login screen with email/phone, password, forgot password, and social login UI
 class LoginScreen extends StatefulWidget {
@@ -30,14 +33,26 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
-      
-      if (mounted) {
+      try {
+        final email = _emailController.text.trim();
+        final password = _passwordController.text;
+
+        await AuthService.instance.signIn(email: email, password: password);
+
+        if (mounted) {
+          setState(() => _isLoading = false);
+          context.go(AppRoutes.locationPermission);
+        }
+      } on FirebaseAuthException catch (e) {
         setState(() => _isLoading = false);
-        // Navigate to location permission screen after login
-        context.go(AppRoutes.locationPermission);
+        final msg = '${e.code}: ${e.message ?? 'Login failed'}';
+        print('Login FirebaseAuthException: $msg');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      } catch (e) {
+        setState(() => _isLoading = false);
+        final msg = e.toString();
+        print('Login error: $msg');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
       }
     }
   }

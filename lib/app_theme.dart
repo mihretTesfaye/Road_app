@@ -160,25 +160,25 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: MaterialStatePropertyAll(primaryColor),
-          foregroundColor: MaterialStatePropertyAll(white),
-          padding: MaterialStatePropertyAll(
+          backgroundColor: WidgetStatePropertyAll(primaryColor),
+          foregroundColor: WidgetStatePropertyAll(white),
+          padding: WidgetStatePropertyAll(
             const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           ),
-          shape: MaterialStatePropertyAll(
+          shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(radiusM),
             ),
           ),
-          textStyle: MaterialStatePropertyAll(buttonText),
-          elevation: const MaterialStatePropertyAll(6),
+          textStyle: WidgetStatePropertyAll(buttonText),
+          elevation: const WidgetStatePropertyAll(6),
         ),
       ),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: primaryColor,
         elevation: 6,
       ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: surfaceRose,
         selectedItemColor: primaryColor,
         unselectedItemColor: textSecondary,
@@ -190,25 +190,25 @@ class AppTheme {
         fillColor: white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
-          borderSide: BorderSide(color: dividerColor),
+          borderSide: const BorderSide(color: dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
-          borderSide: BorderSide(color: dividerColor),
+          borderSide: const BorderSide(color: dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
-          borderSide: BorderSide(color: primaryColor, width: 2),
+          borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
-          borderSide: BorderSide(color: errorColor),
+          borderSide: const BorderSide(color: errorColor),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: spacingM,
           vertical: spacingM,
         ),
-        hintStyle: TextStyle(color: textHint, fontFamily: bodyFont),
+        hintStyle: const TextStyle(color: textHint, fontFamily: bodyFont),
       ),
       textTheme: TextTheme(
         displayLarge: heading1,

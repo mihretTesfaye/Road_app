@@ -12,7 +12,20 @@
           "package_name": "com.example.tara_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "616483723793-s2gou3rigmos98ofemtoi7tceegk2dq2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tara_app",
+            "certificate_hash": "446dce560bce8ecd0a5b85b597fc19810ddbfe42"
+          }
+        },
+        {
+          "client_id": "616483723793-2d0cnr6s6r7bshsp5j8gipe37dhkr34c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB7pYMvl2b7sHaONwYl1x26jGWVzxxd1J0"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "616483723793-2d0cnr6s6r7bshsp5j8gipe37dhkr34c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "616483723793-dcqss6nutk496g2scftbr2u84ba2led6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.taraApp"
+              }
+            }
+          ]
         }
       }
     }

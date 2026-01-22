@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import '../app_theme.dart';
+import '../models/contact_model.dart';
 import '../widgets/contact_tile.dart';
 
 /// Contacts screen with searchable contact list and add contact button
@@ -12,14 +16,15 @@ class ContactsScreen extends StatefulWidget {
 
 class _ContactsScreenState extends State<ContactsScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<Contact> _contacts = [];
-  List<Contact> _filteredContacts = [];
+  List<ContactModel> _contacts = [];
+  List<ContactModel> _filteredContacts = [];
+  final _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
-    _loadDummyContacts();
     _searchController.addListener(_filterContacts);
+    _listenContacts();
   }
 
   @override
@@ -28,59 +33,22 @@ class _ContactsScreenState extends State<ContactsScreen> {
     super.dispose();
   }
 
-  void _loadDummyContacts() {
-    // Dummy contact data
-    _contacts = [
-      Contact(
-        id: '1',
-        name: 'John Smith',
-        phone: '+251 911 234 567',
-        email: 'john.smith@example.com',
-      ),
-      Contact(
-        id: '2',
-        name: 'Sarah Johnson',
-        phone: '+251 912 345 678',
-        email: 'sarah.j@example.com',
-      ),
-      Contact(
-        id: '3',
-        name: 'Michael Brown',
-        phone: '+251 913 456 789',
-        email: 'michael.brown@example.com',
-      ),
-      Contact(
-        id: '4',
-        name: 'Emily Davis',
-        phone: '+251 914 567 890',
-        email: 'emily.davis@example.com',
-      ),
-      Contact(
-        id: '5',
-        name: 'David Wilson',
-        phone: '+251 915 678 901',
-        email: 'david.w@example.com',
-      ),
-      Contact(
-        id: '6',
-        name: 'Lisa Anderson',
-        phone: '+251 916 789 012',
-        email: 'lisa.a@example.com',
-      ),
-      Contact(
-        id: '7',
-        name: 'Robert Taylor',
-        phone: '+251 917 890 123',
-        email: 'robert.t@example.com',
-      ),
-      Contact(
-        id: '8',
-        name: 'Maria Garcia',
-        phone: '+251 918 901 234',
-        email: 'maria.g@example.com',
-      ),
-    ];
-    _filteredContacts = _contacts;
+  void _listenContacts() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('contacts')
+        .orderBy('name')
+        .snapshots()
+        .listen((snap) {
+      final items = snap.docs.map((d) => ContactModel.fromMap(d.data())).toList();
+      setState(() {
+        _contacts = items;
+        _filterContacts();
+      });
+    });
   }
 
   void _filterContacts() {
@@ -145,25 +113,25 @@ class _ContactsScreenState extends State<ContactsScreen> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              if (nameController.text.isNotEmpty &&
-                  phoneController.text.isNotEmpty) {
-                final newContact = Contact(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+            onPressed: () async {
+              if (nameController.text.isNotEmpty && phoneController.text.isNotEmpty) {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user == null) return;
+                final id = DateTime.now().millisecondsSinceEpoch.toString();
+                final contact = ContactModel(
+                  id: id,
                   name: nameController.text,
                   phone: phoneController.text,
-                  email: emailController.text.isEmpty
-                      ? null
-                      : emailController.text,
+                  email: emailController.text.isEmpty ? null : emailController.text,
                 );
-                setState(() {
-                  _contacts.add(newContact);
-                  _filterContacts();
-                });
+                await _firestore
+                    .collection('users')
+                    .doc(user.uid)
+                    .collection('contacts')
+                    .doc(id)
+                    .set(contact.toMap());
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Contact added successfully')),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Contact added successfully')));
               }
             },
             child: const Text('Add'),
@@ -242,39 +210,27 @@ class _ContactsScreenState extends State<ContactsScreen> {
                       ],
                     ),
                   )
-                : ListView.builder(
+                  : ListView.builder(
                     itemCount: _filteredContacts.length,
                     itemBuilder: (context, index) {
                       final contact = _filteredContacts[index];
                       return ContactTile(
                         contact: contact,
                         onTap: () {
-                          // Show contact details or actions
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Selected: ${contact.name}'),
-                            ),
+                            SnackBar(content: Text('Selected: ${contact.name}')),
                           );
                         },
-                        onDelete: () {
-                          setState(() {
-                            _contacts.removeWhere((c) => c.id == contact.id);
-                            _filterContacts();
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${contact.name} removed'),
-                              action: SnackBarAction(
-                                label: 'Undo',
-                                onPressed: () {
-                                  setState(() {
-                                    _contacts.add(contact);
-                                    _filterContacts();
-                                  });
-                                },
-                              ),
-                            ),
-                          );
+                        onDelete: () async {
+                          final user = FirebaseAuth.instance.currentUser;
+                          if (user == null) return;
+                          await _firestore
+                              .collection('users')
+                              .doc(user.uid)
+                              .collection('contacts')
+                              .doc(contact.id)
+                              .delete();
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${contact.name} removed')));
                         },
                       );
                     },

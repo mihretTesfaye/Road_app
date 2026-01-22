@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../app_theme.dart';
+import '../models/user_model.dart';
 import '../routes.dart';
+import '../services/auth_service.dart';
 
 /// Side drawer menu widget
 class DrawerMenu extends StatelessWidget {
@@ -50,18 +54,38 @@ class DrawerMenu extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppTheme.spacingM),
-                Text(
-                  'John Doe', // Dummy user name
-                  style: AppTheme.heading3.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: AppTheme.spacingXS),
-                Text(
-                  'john.doe@example.com', // Dummy email
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: Colors.white70,
-                  ),
+                // Show authenticated user's name/email from Firestore
+                StreamBuilder<User?>(
+                  stream: AuthService.instance.authStateChanges(),
+                  builder: (context, snap) {
+                    if (!snap.hasData) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Guest', style: AppTheme.heading3.copyWith(color: Colors.white)),
+                          const SizedBox(height: AppTheme.spacingXS),
+                          Text('', style: AppTheme.bodyMedium.copyWith(color: Colors.white70)),
+                        ],
+                      );
+                    }
+                    final user = snap.data!;
+                    return FutureBuilder<AppUser?>(
+                      future: AuthService.instance.getUserProfile(user.uid),
+                      builder: (context, s2) {
+                        final profile = s2.data;
+                        final name = profile?.name ?? user.displayName ?? 'User';
+                        final email = profile?.email ?? user.email ?? '';
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(name, style: AppTheme.heading3.copyWith(color: Colors.white)),
+                            const SizedBox(height: AppTheme.spacingXS),
+                            Text(email, style: AppTheme.bodyMedium.copyWith(color: Colors.white70)),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 ),
               ],
             ),
@@ -169,6 +193,7 @@ class DrawerMenu extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
+              AuthService.instance.signOut();
               context.go(AppRoutes.login);
             },
             child: const Text(

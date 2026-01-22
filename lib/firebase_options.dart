@@ -71,4 +71,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'roadapp-7f30d.firebasestorage.app',
     iosBundleId: 'com.example.taraApp',
   );
+
 }
