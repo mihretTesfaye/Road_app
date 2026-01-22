@@ -1,11 +1,22 @@
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart' show GoogleMap, GoogleMapController, CameraPosition, LatLng, MapType, Marker, MarkerId, InfoWindow;
+import 'package:google_maps_flutter/google_maps_flutter.dart'
+    show
+        GoogleMap,
+        GoogleMapController,
+        CameraPosition,
+        LatLng,
+        MapType,
+        Marker,
+        MarkerId,
+        InfoWindow;
 
 import '../app_theme.dart';
 import '../routes.dart';
+import '../utils/maps_check_stub.dart'
+    if (dart.library.html) '../utils/maps_check_web.dart';
 import '../widgets/drawer_menu.dart';
 import 'sos_confirm_dialog.dart';
 
@@ -42,16 +53,14 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
         children: [
           // Google Maps or Placeholder for Windows
           _buildMapWidget(),
-          
+
           // SOS Button (Floating Action Button)
           Positioned(
             bottom: 100,
             right: 20,
-            child: _SOSButton(
-              onPressed: () => _showSOSDialog(context),
-            ),
+            child: _SOSButton(onPressed: () => _showSOSDialog(context)),
           ),
-          
+
           // Bottom Navigation Bar
           Positioned(
             bottom: 0,
@@ -68,49 +77,46 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
                   ),
                 ],
               ),
-                child: BottomNavigationBar(
-                  currentIndex: _currentIndex,
-                  onTap: (index) {
-                    setState(() => _currentIndex = index);
-                    if (index == 1) {
-                      // Navigate to contacts
-                      context.go(AppRoutes.contacts);
-                    } else if (index == 2) {
-                      // History tab
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('History coming soon')),
-                      );
-                      setState(() => _currentIndex = 0);
-                    } else if (index == 3) {
-                      // Settings tab
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Settings coming soon')),
-                      );
-                      setState(() => _currentIndex = 0);
-                    }
-                  },
-                  type: BottomNavigationBarType.fixed,
-                  selectedItemColor: AppTheme.primaryColor,
-                  unselectedItemColor: AppTheme.textSecondary,
-                  items: [
-                    BottomNavigationBarItem(
-                      icon: SvgPicture.asset('assets/icons/map.svg', width: 22, height: 22),
-                      label: 'Map',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: SvgPicture.asset('assets/icons/contacts.svg', width: 22, height: 22),
-                      label: 'Contacts',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: SvgPicture.asset('assets/icons/history.svg', width: 22, height: 22),
-                      label: 'History',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: SvgPicture.asset('assets/icons/settings.svg', width: 22, height: 22),
-                      label: 'Settings',
-                    ),
-                  ],
-                ),
+              child: BottomNavigationBar(
+                currentIndex: _currentIndex,
+                onTap: (index) {
+                  setState(() => _currentIndex = index);
+                  if (index == 1) {
+                    // Navigate to contacts
+                    context.go(AppRoutes.contacts);
+                  } else if (index == 2) {
+                    // History tab
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('History coming soon')),
+                    );
+                    setState(() => _currentIndex = 0);
+                  } else if (index == 3) {
+                    // Settings tab
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Settings coming soon')),
+                    );
+                    setState(() => _currentIndex = 0);
+                  }
+                },
+                type: BottomNavigationBarType.fixed,
+                selectedItemColor: AppTheme.primaryColor,
+                unselectedItemColor: AppTheme.textSecondary,
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.contacts),
+                    label: 'Contacts',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.history),
+                    label: 'History',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.settings),
+                    label: 'Settings',
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -121,20 +127,17 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
   Widget _buildMapWidget() {
     // Google Maps Flutter doesn't support Windows desktop
     // Show a placeholder map for Windows
-    if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows ||
-        defaultTargetPlatform == TargetPlatform.linux ||
-        defaultTargetPlatform == TargetPlatform.macOS)) {
+    if (!kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.windows ||
+            defaultTargetPlatform == TargetPlatform.linux ||
+            defaultTargetPlatform == TargetPlatform.macOS)) {
       return Container(
         color: AppTheme.backgroundColor,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.map,
-                size: 64,
-                color: AppTheme.textSecondary,
-              ),
+              Icon(Icons.map, size: 64, color: AppTheme.textSecondary),
               const SizedBox(height: 16),
               Text(
                 'Map View',
@@ -162,11 +165,50 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
       target: LatLng(9.1450, 38.7667), // Addis Ababa, Ethiopia (example)
       zoom: 14.0,
     );
-    
+
+    // On web, if the Maps JS API hasn't loaded (window.google.maps),
+    // show a safe placeholder instead of the GoogleMap widget so the
+    // page doesn't throw a TypeError and appear to hang.
+    if (kIsWeb) {
+      try {
+        if (!isMapsLoaded()) {
+          return Container(
+            color: AppTheme.backgroundColor,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.map, size: 64, color: AppTheme.textSecondary),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Map is unavailable on web (Maps JS not loaded)',
+                    style: AppTheme.bodyLarge.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Please ensure your Google Maps API key is set in web/index.html',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      } catch (_) {
+        // If any error checking maps, fall through to try rendering map.
+      }
+    }
+
     return GoogleMap(
       initialCameraPosition: initialPosition,
       myLocationEnabled: true,
-      myLocationButtonEnabled: false,
+      myLocationButtonEnabled: true,
       mapType: MapType.normal,
       zoomControlsEnabled: false,
       onMapCreated: (GoogleMapController controller) {
