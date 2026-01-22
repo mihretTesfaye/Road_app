@@ -163,18 +163,18 @@ class AppTheme {
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: MaterialStatePropertyAll(primaryColor),
-          foregroundColor: MaterialStatePropertyAll(white),
-          padding: MaterialStatePropertyAll(
+          backgroundColor: WidgetStatePropertyAll(primaryColor),
+          foregroundColor: WidgetStatePropertyAll(white),
+          padding: WidgetStatePropertyAll(
             const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           ),
-          shape: MaterialStatePropertyAll(
+          shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(radiusM),
             ),
           ),
-          textStyle: MaterialStatePropertyAll(buttonText),
-          elevation: const MaterialStatePropertyAll(6),
+          textStyle: WidgetStatePropertyAll(buttonText),
+          elevation: const WidgetStatePropertyAll(6),
         ),
       ),
 
