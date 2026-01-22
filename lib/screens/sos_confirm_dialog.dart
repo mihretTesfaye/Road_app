@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../app_theme.dart';
@@ -90,9 +92,41 @@ class SOSConfirmDialog extends StatelessWidget {
     );
   }
 
-  void _handleSOS(BuildContext context) {
+  Future<void> _handleSOS(BuildContext context) async {
     Navigator.pop(context); // Close confirmation dialog
-    
+
+    final user = FirebaseAuth.instance.currentUser;
+    final firestore = FirebaseFirestore.instance;
+
+    if (user != null) {
+      try {
+        final contactSnap = await firestore.collection('users').doc(user.uid).collection('contacts').get();
+        final recipients = contactSnap.docs.map((d) => d.id).toList();
+
+        final sosRef = await firestore.collection('users').doc(user.uid).collection('sos_alerts').add({
+          'timestamp': FieldValue.serverTimestamp(),
+          'recipients': recipients,
+        });
+
+        for (final d in contactSnap.docs) {
+          await firestore
+              .collection('users')
+              .doc(user.uid)
+              .collection('contacts')
+              .doc(d.id)
+              .collection('messages')
+              .add({
+            'text': 'SOS Alert: I need help. Please respond.',
+            'timestamp': FieldValue.serverTimestamp(),
+            'sentByUser': true,
+            'sosId': sosRef.id,
+          });
+        }
+      } catch (e) {
+        print('Error recording SOS: $e');
+      }
+    }
+
     // Show success state
     showDialog(
       context: context,

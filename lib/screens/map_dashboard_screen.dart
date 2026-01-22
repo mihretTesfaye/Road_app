@@ -85,11 +85,8 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
                     // Navigate to contacts
                     context.go(AppRoutes.contacts);
                   } else if (index == 2) {
-                    // History tab
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('History coming soon')),
-                    );
-                    setState(() => _currentIndex = 0);
+                    // Messages tab
+                    context.go(AppRoutes.messages);
                   } else if (index == 3) {
                     // Settings tab
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -108,8 +105,8 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
                     label: 'Contacts',
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.history),
-                    label: 'History',
+                    icon: Icon(Icons.message),
+                    label: 'Messages',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.settings),
