@@ -45,13 +45,31 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
       await prefs.setBool('location_shown_${user.uid}', true);
     }
 
-    if (status.isGranted) {
-      if (mounted) context.go(AppRoutes.dashboard);
-    } else if (status.isPermanentlyDenied) {
+    // If permanently denied, prompt the user to open settings.
+    if (status.isPermanentlyDenied) {
       if (mounted) _showOpenSettingsDialog();
     } else if (status.isDenied) {
+      // Briefly notify the user that some features may be limited.
       if (mounted) _showPermissionDeniedSnack();
     }
+  }
+
+  Future<void> _handleEnablePressed() async {
+    // Store per-user flag and navigate immediately to dashboard.
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('location_shown_${user.uid}', true);
+    }
+
+    if (!mounted) return;
+    context.go(AppRoutes.dashboard);
+
+    // Request permission in background without blocking navigation.
+    Permission.locationWhenInUse.request().then((status) {
+      // No UI navigation here; silently handle result.
+      // If permanently denied, we could notify later when user returns.
+    });
   }
 
   void _showPermissionDeniedSnack() {
@@ -172,9 +190,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                 text: _status?.isGranted == true
                     ? 'Continue'
                     : 'Enable Location',
-                onPressed: _status?.isGranted == true
-                    ? () => context.go(AppRoutes.dashboard)
-                    : _requestPermission,
+                onPressed: _handleEnablePressed,
                 isLoading: _isRequesting,
                 width: double.infinity,
                 icon: Icons.location_on,
