@@ -1,13 +1,14 @@
+//business logic for authentication using Firebase Auth and Firestore
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/user_model.dart';
 
 class AuthService {
-  AuthService._();
+  AuthService._();//private constructor for singleton
   static final instance = AuthService._();
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;//private instance of FirebaseAuth
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   User? get currentUser => _auth.currentUser;

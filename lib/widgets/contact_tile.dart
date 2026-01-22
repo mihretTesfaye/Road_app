@@ -8,12 +8,14 @@ class ContactTile extends StatelessWidget {
   final ContactModel contact;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onInvite;
 
   const ContactTile({
     super.key,
     required this.contact,
     this.onTap,
     this.onDelete,
+    this.onInvite,
   });
 
   String get _initials {
@@ -71,7 +73,12 @@ class ContactTile extends StatelessWidget {
                 icon: const Icon(Icons.delete_outline, color: AppTheme.errorColor),
                 onPressed: onDelete,
               )
-            : const Icon(Icons.chevron_right, color: AppTheme.textHint),
+            : onInvite != null
+                ? TextButton(
+                    onPressed: onInvite,
+                    child: const Text('Invite'),
+                  )
+                : const Icon(Icons.chevron_right, color: AppTheme.textHint),
         onTap: onTap,
       ),
     );
