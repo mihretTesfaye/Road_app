@@ -1,6 +1,16 @@
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart' show GoogleMap, GoogleMapController, CameraPosition, LatLng, MapType, Marker, MarkerId, InfoWindow;
+import 'package:google_maps_flutter/google_maps_flutter.dart'
+    show
+        GoogleMap,
+        GoogleMapController,
+        CameraPosition,
+        LatLng,
+        MapType,
+        Marker,
+        MarkerId,
+        InfoWindow;
 import 'package:go_router/go_router.dart';
 import '../app_theme.dart';
 import '../routes.dart';
@@ -40,16 +50,14 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
         children: [
           // Google Maps or Placeholder for Windows
           _buildMapWidget(),
-          
+
           // SOS Button (Floating Action Button)
           Positioned(
             bottom: 100,
             right: 20,
-            child: _SOSButton(
-              onPressed: () => _showSOSDialog(context),
-            ),
+            child: _SOSButton(onPressed: () => _showSOSDialog(context)),
           ),
-          
+
           // Bottom Navigation Bar
           Positioned(
             bottom: 0,
@@ -91,10 +99,7 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
                 selectedItemColor: AppTheme.primaryColor,
                 unselectedItemColor: AppTheme.textSecondary,
                 items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.map),
-                    label: 'Map',
-                  ),
+                  BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.contacts),
                     label: 'Contacts',
@@ -119,20 +124,17 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
   Widget _buildMapWidget() {
     // Google Maps Flutter doesn't support Windows desktop
     // Show a placeholder map for Windows
-    if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows ||
-        defaultTargetPlatform == TargetPlatform.linux ||
-        defaultTargetPlatform == TargetPlatform.macOS)) {
+    if (!kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.windows ||
+            defaultTargetPlatform == TargetPlatform.linux ||
+            defaultTargetPlatform == TargetPlatform.macOS)) {
       return Container(
         color: AppTheme.backgroundColor,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.map,
-                size: 64,
-                color: AppTheme.textSecondary,
-              ),
+              Icon(Icons.map, size: 64, color: AppTheme.textSecondary),
               const SizedBox(height: 16),
               Text(
                 'Map View',
@@ -160,11 +162,11 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
       target: LatLng(9.1450, 38.7667), // Addis Ababa, Ethiopia (example)
       zoom: 14.0,
     );
-    
+
     return GoogleMap(
       initialCameraPosition: initialPosition,
       myLocationEnabled: true,
-      myLocationButtonEnabled: false,
+      myLocationButtonEnabled: true,
       mapType: MapType.normal,
       zoomControlsEnabled: false,
       onMapCreated: (GoogleMapController controller) {
