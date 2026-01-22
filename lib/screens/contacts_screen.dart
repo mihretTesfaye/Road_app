@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../app_theme.dart';
 import '../models/contact_model.dart';
 import '../widgets/contact_tile.dart';
+import '../services/contacts_service.dart';
 
 /// Contacts screen with searchable contact list and add contact button
 class ContactsScreen extends StatefulWidget {
@@ -18,12 +19,14 @@ class _ContactsScreenState extends State<ContactsScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<ContactModel> _contacts = [];
   List<ContactModel> _filteredContacts = [];
+  Map<String, bool> _isRegistered = {};
   final _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_filterContacts);
+    _loadLocalCache();
     _listenContacts();
   }
 
@@ -48,7 +51,36 @@ class _ContactsScreenState extends State<ContactsScreen> {
         _contacts = items;
         _filterContacts();
       });
+      _fetchRegistrationStatus(items.map((e) => e.id).toList());
+      // keep a local cache so contacts remain available if Firestore is slow/offline
+      ContactsService.saveLocalContacts(user.uid, items);
     });
+  }
+
+  Future<void> _fetchRegistrationStatus(List<String> ids) async {
+    final Map<String, bool> map = {};
+    try {
+      final futures = ids.map((id) => _firestore.collection('users').doc(id).get());
+      final results = await Future.wait(futures);
+      for (var i = 0; i < ids.length; i++) {
+        map[ids[i]] = results[i].exists;
+      }
+    } catch (_) {}
+    setState(() {
+      _isRegistered = map;
+    });
+  }
+
+  Future<void> _loadLocalCache() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final cached = await ContactsService.loadLocalContacts(user.uid);
+    if (cached.isNotEmpty) {
+      setState(() {
+        _contacts = cached;
+        _filterContacts();
+      });
+    }
   }
 
   void _filterContacts() {
@@ -130,6 +162,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     .collection('contacts')
                     .doc(id)
                     .set(contact.toMap());
+                      // also update local cache immediately
+                      await ContactsService.addLocalContact(user.uid, contact);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Contact added successfully')));
               }
@@ -214,6 +248,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     itemCount: _filteredContacts.length,
                     itemBuilder: (context, index) {
                       final contact = _filteredContacts[index];
+                      final registered = _isRegistered[contact.id] ?? false;
                       return ContactTile(
                         contact: contact,
                         onTap: () {
@@ -221,17 +256,27 @@ class _ContactsScreenState extends State<ContactsScreen> {
                             SnackBar(content: Text('Selected: ${contact.name}')),
                           );
                         },
-                        onDelete: () async {
-                          final user = FirebaseAuth.instance.currentUser;
-                          if (user == null) return;
-                          await _firestore
-                              .collection('users')
-                              .doc(user.uid)
-                              .collection('contacts')
-                              .doc(contact.id)
-                              .delete();
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${contact.name} removed')));
-                        },
+                        onDelete: registered
+                            ? () async {
+                                final user = FirebaseAuth.instance.currentUser;
+                                if (user == null) return;
+                                await _firestore
+                                    .collection('users')
+                                    .doc(user.uid)
+                                    .collection('contacts')
+                                    .doc(contact.id)
+                                    .delete();
+                                // remove from local cache as well
+                                await ContactsService.removeLocalContact(user.uid, contact.id);
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${contact.name} removed')));
+                              }
+                            : null,
+                        onInvite: registered
+                            ? null
+                            : () {
+                                final email = contact.email ?? 'No email provided';
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invite sent to $email')));
+                              },
                       );
                     },
                   ),

@@ -25,7 +25,7 @@ class SOSConfirmDialog extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: const BoxDecoration(
-                color: AppTheme.sosBackground,
+                color: AppTheme.sosBackground, 
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -101,27 +101,42 @@ class SOSConfirmDialog extends StatelessWidget {
     if (user != null) {
       try {
         final contactSnap = await firestore.collection('users').doc(user.uid).collection('contacts').get();
-        final recipients = contactSnap.docs.map((d) => d.id).toList();
+        // Determine which contacts are registered users (have a users/{uid} doc)
+        final recipientsAll = contactSnap.docs.map((d) => d.id).toList();
+        final registered = <String>[];
 
+        // Check registration in parallel
+        final checks = await Future.wait(contactSnap.docs.map((d) async {
+          final doc = await firestore.collection('users').doc(d.id).get();
+          return MapEntry(d.id, doc.exists);
+        }));
+
+        for (final e in checks) {
+          if (e.value) registered.add(e.key);
+        }
+
+        // Record SOS alert with recipients (registered ones)
         final sosRef = await firestore.collection('users').doc(user.uid).collection('sos_alerts').add({
           'timestamp': FieldValue.serverTimestamp(),
-          'recipients': recipients,
+          'recipients': registered,
         });
 
-        for (final d in contactSnap.docs) {
-          await firestore
-              .collection('users')
-              .doc(user.uid)
-              .collection('contacts')
-              .doc(d.id)
-              .collection('messages')
-              .add({
-            'text': 'SOS Alert: I need help. Please respond.',
+        // Helper: deterministic chat id function
+        String chatIdFor(String a, String b) => (a.compareTo(b) <= 0) ? '${a}_$b' : '${b}_$a';
+
+        // Send a chat message to each registered recipient under chats/{chatId}/messages
+        for (final rid in registered) {
+          final chatId = chatIdFor(user.uid, rid);
+          await firestore.collection('chats').doc(chatId).collection('messages').add({
+            'text': '🚨 SOS sent!',
+            'senderId': user.uid,
             'timestamp': FieldValue.serverTimestamp(),
-            'sentByUser': true,
+            'isSOS': true,
             'sosId': sosRef.id,
           });
         }
+
+        // For any unregistered contacts, we will not send chat messages (they'll see Invite in UI)
       } catch (e) {
         print('Error recording SOS: $e');
       }

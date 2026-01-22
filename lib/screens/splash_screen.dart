@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import '../app_theme.dart';
-import '../routes.dart';
-import '../widgets/primary_button.dart';
+import 'package:flutter/material.dart';///main skeleton
+import 'package:go_router/go_router.dart';///navigation library
+import '../app_theme.dart';//app theme 
+import '../routes.dart';//route definition
+import '../widgets/primary_button.dart';///using one button many times
 
 /// Splash/Welcome screen with logo, tagline, and navigation buttons
 class SplashScreen extends StatefulWidget {
