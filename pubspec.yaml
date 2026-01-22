@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+    
 
   # Routing
   go_router: ^17.0.1
@@ -30,3 +31,11 @@ dependencies:
   permission_handler: ^12.0.1
   shared_preferences: ^2.5.4
   google_fonts: ^4.0.5
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icons/   # folder containing your SVG files
+    - assets/images/  # folder containing your image files
+    
