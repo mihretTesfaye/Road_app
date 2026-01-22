@@ -16,6 +16,8 @@ import '../app_theme.dart';
 import '../routes.dart';
 import '../widgets/drawer_menu.dart';
 import 'sos_confirm_dialog.dart';
+import '../utils/maps_check_stub.dart'
+    if (dart.library.html) '../utils/maps_check_web.dart';
 
 /// Main Dashboard with Google Maps integration
 class MapDashboardScreen extends StatefulWidget {
@@ -162,6 +164,45 @@ class _MapDashboardScreenState extends State<MapDashboardScreen> {
       target: LatLng(9.1450, 38.7667), // Addis Ababa, Ethiopia (example)
       zoom: 14.0,
     );
+
+    // On web, if the Maps JS API hasn't loaded (window.google.maps),
+    // show a safe placeholder instead of the GoogleMap widget so the
+    // page doesn't throw a TypeError and appear to hang.
+    if (kIsWeb) {
+      try {
+        if (!isMapsLoaded()) {
+          return Container(
+            color: AppTheme.backgroundColor,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.map, size: 64, color: AppTheme.textSecondary),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Map is unavailable on web (Maps JS not loaded)',
+                    style: AppTheme.bodyLarge.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Please ensure your Google Maps API key is set in web/index.html',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      } catch (_) {
+        // If any error checking maps, fall through to try rendering map.
+      }
+    }
 
     return GoogleMap(
       initialCameraPosition: initialPosition,
