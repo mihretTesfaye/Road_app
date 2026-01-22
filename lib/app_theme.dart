@@ -160,18 +160,18 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: WidgetStatePropertyAll(primaryColor),
-          foregroundColor: WidgetStatePropertyAll(white),
-          padding: WidgetStatePropertyAll(
+          backgroundColor: MaterialStatePropertyAll(primaryColor),
+          foregroundColor: MaterialStatePropertyAll(white),
+          padding: MaterialStatePropertyAll(
             const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           ),
-          shape: WidgetStatePropertyAll(
+          shape: MaterialStatePropertyAll(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(radiusM),
             ),
           ),
-          textStyle: WidgetStatePropertyAll(buttonText),
-          elevation: const WidgetStatePropertyAll(6),
+          textStyle: MaterialStatePropertyAll(buttonText),
+          elevation: const MaterialStatePropertyAll(6),
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(

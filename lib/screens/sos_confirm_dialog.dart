@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+
 import '../app_theme.dart';
 import '../widgets/primary_button.dart';
 
@@ -22,7 +22,7 @@ class SOSConfirmDialog extends StatelessWidget {
             Container(
               width: 80,
               height: 80,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppTheme.sosBackground,
                 shape: BoxShape.circle,
               ),
